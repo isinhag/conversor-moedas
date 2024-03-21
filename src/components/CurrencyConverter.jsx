@@ -4,91 +4,98 @@ import "./CurrencyConverter.css";
 
 const CurrencyConverter = () => {
 
-  // Estado das moedas  (Valor)
-  const [rates, setRates] = useState(null);
+    // Estado das moedas
+    const [rates, setRates] = useState(null);
 
-  // Estado para armazenar a moeda de origem
-  const [fromCurrency, setFromCurrency] = useState("USD");
+    // Estado para armazenar a moeda de origem
+    const [fromCurrency, setFromCurrency] =useState("USD");
 
-  // Estado para armazenar a moeda de destino
-  const [toCurrency, setToCurrency] = useState("EUR");
+    // Estado para armazenar a moeda de destino
+    const [toCurrency, setToCurrency] =useState("EUR");
 
-  // Estado para armazenar o valor a ser convertido
-  const [amount, setAmount] = useState("1");
-  
-  // Estado para armazenar o valor convertido
-  const [convertedAmount, setConvertedAmount] = useState(null);
+    // Estado para armazenar o valor a ser convertido
+    const [amount, setAmount] =useState("1");
 
-  // Efeito para buscar as taxas de câmbio da API
-  useEffect(() => {
-    axios
-      .get("https://v6.exchangerate-api.com/v6/13ff5a666eb65c49d59d72c8/latest/USD")
-      .then((response) => {
-        setRates(response.data.conversion_rates);
-      })
-      .catch((error) => {
-        console.log("Deu ruim ao obter dados da API", error)
-      });
-  }, []);
+    // Estado para armazenar o valor convertido
+    const [convertedAmount, setConvertedAmount] =useState(null);
 
-  // Calcular o valor convertido e corrigir Delays (Atrasos)
-  useEffect(() => {
-    // Verifica se o objeto rates não é nulo ou indefinido
-    if(rates) { 
+    // Efeito para buscar as taxas de câmbio da API
+    useEffect(() => {
+        axios
+         .get("https://v6.exchangerate-api.com/v6/cd376691becfc2d4a26a3178/latest/USD")
+         .then((response) => {
+            setRates(response.data.conversion_rates);
+         })
+         .catch((error) => {
+            console.log("Deu ruim ao obter dados da API", error);
+         });
+    }, []);
 
-      // Obtem a taxa (moeda origem) senão existir atribui 0
-      const rateFrom = rates[fromCurrency] || 0;
+    // Calcular o valor convertido e corrigir Delays (Atrasos)
+    useEffect(() => {
 
-      // Obtem a taxa (moeda destino) senão existir atribui 0
-      const rateTo = rates[toCurrency] || 0;
+        // Verifica se o objeto rates não é nulo ou indefinido
+        if(rates) {
 
-      // Calcula o valor convertido, arredonda em 2 casas e 
-      // amarzena no Estado "ConvertedAmount"
-      setConvertedAmount(((amount / rateFrom) * rateTo).toFixed(2));
+            // Obtém a taxa (moeda origem) senão existir atribui 0
+            const rateFrom = rates[fromCurrency] || 0;
+
+            // Obtém a taxa (moeda destino) senão existir atribui 0
+            const rateTo = rates[toCurrency] || 0;
+
+            // Calcula o valor convertido, arredonda em 2 casas e
+            // armazena no Estado "ConvertedAmount"
+            setConvertedAmount(((amount / rateFrom) * rateTo).toFixed(2));
+
+        }
+
+    // Este efeito será executado sempre que qualquer um dos itens
+    // (amount, rates, fromCurrency, toCurrency) for atualizado.
+    // Isso é conhecido como (Lista de depedências)
+    },[amount, rates, fromCurrency, toCurrency]);
+
+    // Exibe um loader enquando as taxas não são carregadas
+    // Se rates nulo renderiza (Carregando...)
+    if(!rates) {
+        return<div>Carregando...</div>;
     }
-
-  // Este efeito será executado sempre que qualquer um dos itens 
-  // (amount, rates, fromCurrency, toCurrency) for atualizado.
-  // Isso é conhecido como (Lista de dependências)
-  }, [amount, rates, fromCurrency, toCurrency]);
-
-  // Exibe um loader enquanto as taxas não são carregadas 
-  // Se rates nulo renderiza (Carregando...)
-  if(!rates) {
-    return<div>Carregando...</div>
-  }
 
 
   return (
     <div className="converter">
-        <h2>Coversor de moedas</h2>
+        <h2>Conversor de moedas</h2>
 
-        <input type="number" placeholder="Digite o valor..." value={amount} onChange={(e) => setAmount(e.target.value)}/>
-        <span>Selecionar as moedas</span>
+        <input type="number" placeholder="Digite o valor..."
+        value={amount} onChange={(e) => setAmount(e.target.value)} />
+
+        <span>Selecione as moedas</span>
 
         {/* Dropdown para selecionar a moeda de origem */}
-        <select value={toCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
-           {Object.keys(rates).map((currency) => (
-              <option key={currency} value={currency}>
-                {currency}
-              </option>
-          ))}
+        <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
+            {Object.keys(rates).map((currency)=> (
+                <option key={currency} value={currency}>
+                    {currency}
+                </option>
+            ))}
         </select>
 
-        <span>Para</span>
+        <span>para</span>
 
-       {/* Dropdown para selecionar a moeda de destino */}
-       <select value={fromCurrency} onChange={(e) => setToCurrency(e.target.value)}>
-           {Object.keys(rates).map((currency) => (
-              <option key={currency} value={currency}>
-                {currency}
-              </option>
-          ))}
+        {/* Dropdown para selecionar a moeda de destino */}
+        <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)}>
+            {Object.keys(rates).map((currency)=> (
+                <option key={currency} value={currency}>
+                    {currency}
+                </option>
+            ))}
         </select>
 
         <h3>{convertedAmount} {toCurrency}</h3>
         <p>{amount} {fromCurrency} valem {convertedAmount} {toCurrency}</p>
-    </div> 
+
+
+
+    </div>
   )
 }
 

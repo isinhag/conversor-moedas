@@ -18,6 +18,11 @@
     margin-bottom: 2rem;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif
 }
+.converter h3 {
+    color: blue;
+    font-size: 1.8rem;
+ 
+}
 
 /* define o estilo para os campos de entrada e seleção*/
 .converter input,
